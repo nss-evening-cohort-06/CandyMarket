@@ -8,8 +8,10 @@ namespace CandyMarket
 	{
 		static void Main(string[] args)
 		{
-			// wanna be a l33t h@x0r? skip all this console menu nonsense and go with straight command line arguments. something like `candy-market add taffy "blueberry cheesecake" yesterday`
+			// wanna be a l33t h@x0r? skip all this console menu nonsense and implement command line arguments. something like `candy-market add taffy "blueberry cheesecake" yesterday`
 			var db = SetupNewApp();
+			var me = new CandyEater("Nathan", db);
+			var significantOther = new CandyEater("Allyson", db);
 
 			var run = true;
 			while (run)
@@ -24,7 +26,7 @@ namespace CandyMarket
 					case '1': // add candy to your bag
 
 						// select a candy type
-						var selectedCandyType = AddNewCandyType(db);
+						var newCandyType = AddNewCandyType(db);
 
 						/** MORE DIFFICULT DATA MODEL
 						 * show a new menu to enter candy details
@@ -32,7 +34,11 @@ namespace CandyMarket
 						 */
 
 						// if(moreDifficultDataModel) bug - this is passing candy type right now (which just increments in our DatabaseContext), but should also be passing candy details
-						db.SaveNewCandy(selectedCandyType.KeyChar);
+
+						var candyType = (CandyType)int.Parse(newCandyType.KeyChar.ToString());
+						me.AddCandy(candyType, 1);
+						significantOther.AddCandy(candyType, 1);
+
 						break;
 					case '2':
 						/** eat candy
@@ -54,6 +60,10 @@ namespace CandyMarket
 						 */
 						break;
 					case '4':
+						var giveCandyTypeInput = GiveCandyMenu(db);
+						var giveCandyType = (CandyType)int.Parse(giveCandyTypeInput.KeyChar.ToString());
+
+						me.GiveCandy(giveCandyType, "Allyson");
 						/** give candy
 						 * feel free to hardcode your users. no need to create a whole UI to register users.
 						 * no one is impressed by user registration unless it's just amazingly fast & simple
@@ -107,6 +117,20 @@ namespace CandyMarket
 
 			var newCandyMenu = new View()
 					.AddMenuText("What type of candy did you get?")
+					.AddMenuOptions(candyTypes);
+
+			Console.Write(newCandyMenu.GetFullMenu());
+
+			ConsoleKeyInfo selectedCandyType = Console.ReadKey();
+			return selectedCandyType;
+		}
+
+		static ConsoleKeyInfo GiveCandyMenu(DatabaseContext db)
+		{
+			var candyTypes = db.GetCandyTypes();
+
+			var newCandyMenu = new View()
+					.AddMenuText("What type of candy would you like to give?")
 					.AddMenuOptions(candyTypes);
 
 			Console.Write(newCandyMenu.GetFullMenu());

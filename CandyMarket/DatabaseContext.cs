@@ -7,10 +7,11 @@ namespace CandyMarket
 {
 	internal class DatabaseContext
 	{
-		private int _countOfTaffy;
-		private int _countOfCandyCoated;
-		private int _countOfChocolateBar;
-		private int _countOfZagnut;
+		Dictionary<string, int> _taffy = new Dictionary<string, int>();
+		Dictionary<string, int> _candyCoated = new Dictionary<string, int>();
+		Dictionary<string, int> _compressedSugar = new Dictionary<string, int>();
+		Dictionary<string, int> _zagnut = new Dictionary<string, int>();
+
 
 		/**
 		 * this is just an example.
@@ -29,26 +30,62 @@ namespace CandyMarket
 				.ToList();
 		}
 
-		internal void SaveNewCandy(char selectedCandyMenuOption)
+		internal void SaveNewCandy(string userName, CandyType candyType, int howMany)
 		{
-			var candyOption = int.Parse(selectedCandyMenuOption.ToString());
+			if (!_taffy.ContainsKey(userName))
+			{
+				_taffy.Add(userName, 0);
+				_candyCoated.Add(userName, 0);
+				_compressedSugar.Add(userName, 0);
+				_zagnut.Add(userName, 0);
+			}
 
-			var maybeCandyMaybeNot = (CandyType)selectedCandyMenuOption;
-			var forRealTheCandyThisTime = (CandyType)candyOption;
-
-			switch (forRealTheCandyThisTime)
+			switch (candyType)
 			{
 				case CandyType.TaffyNotLaffy:
-					++_countOfTaffy;
+					_taffy[userName] += howMany;
 					break;
 				case CandyType.CandyCoated:
-					++_countOfCandyCoated;
+					_candyCoated[userName] += howMany;
 					break;
 				case CandyType.CompressedSugar:
-					++_countOfChocolateBar;
+					_compressedSugar[userName] += howMany;
 					break;
 				case CandyType.ZagnutStyle:
-					++_countOfZagnut;
+					_zagnut[userName] += howMany;
+					break;
+				default:
+					break;
+			}
+		}
+
+		internal void RemoveCandy(string name, CandyType type)
+		{
+			switch (type)
+			{
+				case CandyType.TaffyNotLaffy:
+					if (_taffy[name] > 0)
+					{
+						_taffy[name]--; 
+					}
+					break;
+				case CandyType.CandyCoated:
+					if (_candyCoated[name] > 0)
+					{
+						_candyCoated[name]--; 
+					}
+					break;
+				case CandyType.CompressedSugar:
+					if (_compressedSugar[name] > 0)
+					{
+						_compressedSugar[name]--; 
+					}
+					break;
+				case CandyType.ZagnutStyle:
+					if (_zagnut[name] > 0)
+					{
+						_zagnut[name]--; 
+					}
 					break;
 				default:
 					break;
